@@ -1,0 +1,88 @@
+Sub yearly_stock_change()
+    Dim Ticker_Name As String
+    Dim Open_Price As Double
+    Dim Close_Price As Double
+    Dim Yearly_Change As Double
+    Dim Percent_Change As Double
+    Dim Summary_Table_Row As Integer
+    
+For Each ws In ThisWorkbook.Worksheets
+    ' Activate each worksheet
+    ws.Activate
+
+ ' Set an initial variable for holding the total volume per ticker name
+    Dim Total_Volume As Double
+    Total_Volume = 0
+    
+ ' Add labels to the summary table
+    Range("i1").Value = "Ticker"
+    Range("J1").Value = "Yearly Change"
+    Range("K1").Value = "Percent Change"
+    Range("L1").Value = "Total Stock Volume"
+
+    ' Keep track of the location of summary table per worksheet
+    Summary_Table_Row = 2
+'Loop through the tickers
+    For i = 2 To 760000
+
+        'set the ticker name
+        Ticker_Name = Cells(i, 1).Value
+    
+        If Cells(i - 1, 1).Value <> Ticker_Name Then
+        ' Get the open price for the year
+            Open_Price = Cells(i, 3).Value
+        End If
+    
+        If Cells(i + 1, 1).Value <> Ticker_Name Then
+        'get the close price if not equal assuming the dates are sorted
+            Close_Price = Cells(i, 6).Value
+        
+        ' Add to the Yearly Change
+            Yearly_Change = Close_Price - Open_Price
+            
+                If Yearly_Change < 0 Then
+        ' Red color for negative values
+                Range("J" & Summary_Table_Row).Interior.Color = RGB(255, 0, 0)
+        
+        ' Green color for positive values
+                ElseIf Yearly_Change > 0 Then
+                Range("J" & Summary_Table_Row).Interior.Color = RGB(0, 255, 0)
+        
+                End If
+        
+        'Get the Percent Change for the year
+            Percent_Change = Yearly_Change / Open_Price * 100
+        
+        'Get the Total Volume
+        Total_Volume = Total_Volume + Cells(i, 7).Value
+
+        ' Print the Ticker Name in the Summary Table
+         Range("I" & Summary_Table_Row).Value = Ticker_Name
+
+        ' Print the Yearly Change to the Summary Table
+        Range("J" & Summary_Table_Row).Value = Yearly_Change
+        
+        'Print the Percent Change to the Summary Table
+        Range("K" & Summary_Table_Row).Value = Str(Percent_Change) + "%"
+        
+        'Print the Total Volume to the Summary Table
+        Range("L" & Summary_Table_Row).Value = Total_Volume
+
+        ' Add one to the summary table row
+        Summary_Table_Row = Summary_Table_Row + 1
+        
+        'Reset the Total Volume
+        Total_Volume = 0
+        
+        Else
+        
+        'Get the Total Volume
+        
+        Total_Volume = Total_Volume + Cells(i, 7).Value
+        
+      
+        End If
+        
+    Next i
+ Next ws
+End Sub
